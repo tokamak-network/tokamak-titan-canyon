@@ -72,7 +72,7 @@ def main():
     ops_bedrock_dir = pjoin(monorepo_dir, 'ops-bedrock')
     deploy_config_dir = pjoin(contracts_bedrock_dir, 'deploy-config')
     devnet_config_path = pjoin(deploy_config_dir, 'devnetL1.json')
-    devnet_config_template_path = pjoin(deploy_config_dir, 'fork.devnetL1-template.json') if args.fork_public_network else pjoin(deploy_config_dir, 'devnetL1-template.json')
+    devnet_config_template_path = pjoin(deploy_config_dir, 'devnetL1-template.json')
     ops_chain_ops = pjoin(monorepo_dir, 'op-chain-ops')
     sdk_dir = pjoin(monorepo_dir, 'packages', 'tokamak', 'sdk') if not args.legacy else pjoin(monorepo_dir, 'packages', 'sdk')
     bedrock_devnet_dir = pjoin(monorepo_dir, 'bedrock-devnet')
@@ -123,24 +123,16 @@ def main():
         log.info('Skipping docker images build')
     else:
         log.info(f'Building docker images for git commit {git_commit} ({git_date})')
-        if args.fork_public_network:
-          run_command(['docker', 'compose', '-f', 'fork.docker-compose.yml', 'build', '--progress', 'plain',
-                     '--build-arg', f'GIT_COMMIT={git_commit}', '--build-arg', f'GIT_DATE={git_date}'],
-                    cwd=paths.ops_bedrock_dir, env={
+        run_command(['docker', 'compose', 'build', '--progress', 'plain',
+                    '--build-arg', f'GIT_COMMIT={git_commit}', '--build-arg', f'GIT_DATE={git_date}'],
+                cwd=paths.ops_bedrock_dir, env={
             'PWD': paths.ops_bedrock_dir,
             'DOCKER_BUILDKIT': '1', # (should be available by default in later versions, but explicitly enable it anyway)
             'COMPOSE_DOCKER_CLI_BUILD': '1',  # use the docker cache
-            'L1_RPC': paths.l1_rpc_url,
-            'FROM_BLOCK_NUMBER': str(paths.from_block_number)
-          })
-        else:
-          run_command(['docker', 'compose', 'build', '--progress', 'plain',
-                     '--build-arg', f'GIT_COMMIT={git_commit}', '--build-arg', f'GIT_DATE={git_date}'],
-                    cwd=paths.ops_bedrock_dir, env={
-            'PWD': paths.ops_bedrock_dir,
-            'DOCKER_BUILDKIT': '1', # (should be available by default in later versions, but explicitly enable it anyway)
-            'COMPOSE_DOCKER_CLI_BUILD': '1'  # use the docker cache
-          })
+            'L1_DOCKER_FILE': 'Dockerfile.l1.fork' if paths.fork_public_network else 'Dockerfile.l1',
+            'FROM_BLOCK_NUMBER': str(args.from_block_number),
+            'L1_RPC': args.l1_rpc_url
+        })
 
     log.info('Devnet starting')
     devnet_deploy(paths)
@@ -313,14 +305,9 @@ def devnet_deploy(paths):
         ], cwd=paths.op_node_dir)
 
     log.info('Starting L1.')
-    if paths.fork_public_network:
-      run_command(['docker', 'compose', '-f', 'fork.docker-compose.yml', 'up', '-d', 'fork-l1'], cwd=paths.ops_bedrock_dir, env={
+    run_command(['docker', 'compose', 'up', '-d', 'l1'], cwd=paths.ops_bedrock_dir, env={
         'PWD': paths.ops_bedrock_dir
-      })
-    else:
-      run_command(['docker', 'compose', '-f', 'docker-compose.yml', 'up', '-d', 'l1'], cwd=paths.ops_bedrock_dir, env={
-        'PWD': paths.ops_bedrock_dir
-      })
+    })
     wait_up(8545)
     wait_for_rpc_server('127.0.0.1:8545')
 
