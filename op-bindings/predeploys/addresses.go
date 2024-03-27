@@ -26,6 +26,12 @@ const (
 	SchemaRegistry                = "0x4200000000000000000000000000000000000020"
 	EAS                           = "0x4200000000000000000000000000000000000021"
 	WETH                          = "0x4200000000000000000000000000000000000022"
+	L2UsdcBridge                  = "0xC0d3c0d3c0D3c0d3C0D3c0D3C0d3C0D3C0D30775"
+	L2UsdcBridgeProxy             = "0x4200000000000000000000000000000000000775"
+	SignatureChecker              = "0x4200000000000000000000000000000000000776"
+	MasterMinter                  = "0x4200000000000000000000000000000000000777"
+	FiatTokenV2_2                 = "0xC0d3c0d3c0D3c0d3C0D3c0D3C0d3C0D3C0D30778"
+	FiatTokenProxy                = "0x4200000000000000000000000000000000000778"
 )
 
 var (
@@ -49,6 +55,12 @@ var (
 	SchemaRegistryAddr                = common.HexToAddress(SchemaRegistry)
 	EASAddr                           = common.HexToAddress(EAS)
 	WETHAddr                          = common.HexToAddress(WETH)
+	L2UsdcBridgeAddr                  = common.HexToAddress(L2UsdcBridge)
+	L2UsdcBridgeProxyAddr             = common.HexToAddress(L2UsdcBridgeProxy)
+	SignatureCheckerAddr              = common.HexToAddress(SignatureChecker)
+	MasterMinterAddr                  = common.HexToAddress(MasterMinter)
+	FiatTokenV2_2Addr                 = common.HexToAddress(FiatTokenV2_2)
+	FiatTokenProxyAddr                = common.HexToAddress(FiatTokenProxy)
 
 	Predeploys = make(map[string]*common.Address)
 )
@@ -58,6 +70,12 @@ func IsProxied(predeployAddr common.Address) bool {
 	switch predeployAddr {
 	case WTONAddr:
 	case GovernanceTokenAddr:
+	case L2UsdcBridgeAddr:
+	case L2UsdcBridgeProxyAddr:
+	case SignatureCheckerAddr:
+	case MasterMinterAddr:
+	case FiatTokenProxyAddr:
+	case FiatTokenV2_2Addr:
 	default:
 		return true
 	}
@@ -85,4 +103,10 @@ func init() {
 	Predeploys["SchemaRegistry"] = &SchemaRegistryAddr
 	Predeploys["EAS"] = &EASAddr
 	Predeploys["WETH"] = &WETHAddr
+	Predeploys["L2UsdcBridge"] = &L2UsdcBridgeAddr
+	Predeploys["L2UsdcBridgeProxy"] = &L2UsdcBridgeProxyAddr
+	Predeploys["SignatureChecker"] = &SignatureCheckerAddr
+	Predeploys["MasterMinter"] = &MasterMinterAddr
+	Predeploys["FiatTokenV2_2"] = &FiatTokenV2_2Addr
+	Predeploys["FiatTokenProxy"] = &FiatTokenProxyAddr
 }

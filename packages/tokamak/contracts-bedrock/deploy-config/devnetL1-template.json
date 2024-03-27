@@ -51,5 +51,18 @@
   "faultGameMaxDuration": 1200,
   "systemConfigStartBlock": 0,
   "requiredProtocolVersion": "0x0000000000000000000000000000000000000000000000000000000000000000",
-  "recommendedProtocolVersion": "0x0000000000000000000000000000000000000000000000000000000000000000"
+  "recommendedProtocolVersion": "0x0000000000000000000000000000000000000000000000000000000000000000",
+  "l2UsdcBridgeOwner": "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720",
+  "l2UsdcBridgeProxyData": "0x00",
+  "usdcOwnerAddr": "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720",
+  "masterMinterAddr": "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720",
+  "masterMinterOwnerAddr": "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720",
+  "pauserAddr": "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720",
+  "blacklisterAddr": "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720",
+  "lostAndFoundAddr": "0xa0Ee7A142d267C1f36714E4a8F75612F20a79720",
+  "accountsToBlacklist": [],
+  "tokenName": "Bridged USDC (Tokamak Network)",
+  "tokenSymbol": "USDC.e",
+  "tokenCurrency": "USD",
+  "tokenDecimals": 6
 }

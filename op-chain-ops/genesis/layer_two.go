@@ -68,7 +68,7 @@ func BuildL2Genesis(config *DeployConfig, l1StartBlock *types.Block) (*core.Gene
 			db.CreateAccount(codeAddr)
 			db.SetState(addr, ImplementationSlot, eth.AddressAsLeftPaddedHash(codeAddr))
 			log.Info("Set proxy", "name", name, "address", addr, "implementation", codeAddr)
-		} else {
+		} else if addr != predeploys.L2UsdcBridgeProxyAddr {
 			db.DeleteState(addr, AdminSlot)
 		}
 		if err := setupPredeploy(db, deployResults, storage, name, addr, codeAddr); err != nil {

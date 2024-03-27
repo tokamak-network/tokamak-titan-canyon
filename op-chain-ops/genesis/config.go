@@ -220,6 +220,20 @@ type DeployConfig struct {
 	// RequiredProtocolVersion indicates the protocol version that
 	// nodes are recommended to adopt, to stay in sync with the network.
 	RecommendedProtocolVersion params.ProtocolVersion `json:"recommendedProtocolVersion"`
+	//add
+	L2UsdcBridgeOwner     common.Address `json:"l2UsdcBridgeOwner"`
+	L2UsdcBridgeProxyData []byte         `json:"l2UsdcBridgeProxyData"`
+	UsdcOwnerAddr         common.Address `json:"usdcOwnerAddr"`
+	MasterMinterAddr      common.Address `json:"masterMinterAddr"`
+	MasterMinterOWnerAddr common.Address `json:"masterMinterOWnerAddr"`
+	PauserAddr            common.Address `json:"pauserAddr"`
+	BlacklisterAddr       common.Address `json:"blacklisterAddr"`
+	LostAndFoundAddr      common.Address `json:"lostAndFoundAddr"`
+	AccountsToBlacklist   []string       `json:"accountsToBlacklist"`
+	TokenName             string         `json:"tokenName"`
+	TokenSymbol           string         `json:"tokenSymbol"`
+	TokenCurrency         string         `json:"tokenCurrency"`
+	TokenDecimals         uint64         `json:"tokenDecimals"`
 }
 
 // Copy will deeply copy the DeployConfig. This does a JSON roundtrip to copy
@@ -717,6 +731,20 @@ func NewL2ImmutableConfig(config *DeployConfig, block *types.Block) (immutables.
 		"withdrawalNetwork":       config.BaseFeeVaultWithdrawalNetwork.ToUint8(),
 	}
 	immutable["WETH"] = immutables.ImmutableValues{}
+	immutable["L2UsdcBridge"] = immutables.ImmutableValues{}
+	immutable["L2UsdcBridgeProxy"] = immutables.ImmutableValues{
+		"logic":        predeploys.L2UsdcBridgeAddr,
+		"initialOwner": config.L2UsdcBridgeOwner,
+		"data":         config.L2UsdcBridgeProxyData,
+	}
+	immutable["SignatureChecker"] = immutables.ImmutableValues{}
+	immutable["MasterMinter"] = immutables.ImmutableValues{
+		"minterManager": predeploys.FiatTokenProxyAddr,
+	}
+	immutable["FiatTokenProxy"] = immutables.ImmutableValues{
+		"implementationContract": predeploys.FiatTokenV2_2Addr,
+	}
+	immutable["FiatTokenV2_2"] = immutables.ImmutableValues{}
 
 	return immutable, nil
 }
@@ -790,6 +818,34 @@ func NewL2StorageConfig(config *DeployConfig, block *types.Block) (state.Storage
 		"_name":   "Wrapped Ether",
 		"_symbol": "WETH",
 	}
+	storage["L2UsdcBridge"] = state.StorageValues{
+		"messenger": predeploys.L2CrossDomainMessengerAddr,
+	}
+	storage["L2UsdcBridgeProxy"] = state.StorageValues{
+		"messenger": predeploys.L2CrossDomainMessengerAddr,
+	}
+	storage["SignatureChecker"] = state.StorageValues{}
+	storage["MasterMinter"] = state.StorageValues{
+		"newMinterManager": predeploys.MasterMinterAddr,
+		"owner":            config.MasterMinterOWnerAddr,
+	}
+	// storage["FiatTokenProxy"] = state.StorageValues{}
+	storage["FiatTokenV2_2"] = state.StorageValues{
+		"tokenName":           config.TokenName,
+		"tokenSymbol":         config.TokenSymbol,
+		"tokenCurrency":       config.TokenCurrency,
+		"tokenDecimals":       config.TokenCurrency,
+		"newMasterMinter":     predeploys.MasterMinter,
+		"newPauser":           config.PauserAddr,
+		"newBlacklister":      config.BlacklisterAddr,
+		"newOwner":            config.UsdcOwnerAddr,
+		"newName":             config.TokenName,
+		"lostAndFound":        config.LostAndFoundAddr,
+		"accountsToBlacklist": config.AccountsToBlacklist,
+		"newSymbol":           config.TokenSymbol,
+		"initialized":         initializedValue,
+	}
+
 	return storage, nil
 }
 
