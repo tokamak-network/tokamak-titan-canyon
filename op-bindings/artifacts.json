@@ -44,9 +44,7 @@
   "ISemver",
   "StorageSetter",
   "L2UsdcBridge",
-  "L2UsdcBridgeProxy",
   "SignatureChecker",
   "MasterMinter",
-  "FiatTokenProxy",
   "FiatTokenV2_2"
 ]
