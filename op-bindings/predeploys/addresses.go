@@ -8,7 +8,7 @@ import "github.com/ethereum/go-ethereum/common"
 const (
 	L2ToL1MessagePasser           = "0x4200000000000000000000000000000000000016"
 	DeployerWhitelist             = "0x4200000000000000000000000000000000000002"
-	WTON                          = "0x4200000000000000000000000000000000000006"
+	WNativeToken                  = "0x4200000000000000000000000000000000000006"
 	L2CrossDomainMessenger        = "0x4200000000000000000000000000000000000007"
 	L2StandardBridge              = "0x4200000000000000000000000000000000000010"
 	SequencerFeeVault             = "0x4200000000000000000000000000000000000011"
@@ -25,13 +25,13 @@ const (
 	L1FeeVault                    = "0x420000000000000000000000000000000000001a"
 	SchemaRegistry                = "0x4200000000000000000000000000000000000020"
 	EAS                           = "0x4200000000000000000000000000000000000021"
-	WETH                          = "0x4200000000000000000000000000000000000022"
+	ETH                           = "0x4200000000000000000000000000000000000486"
 )
 
 var (
 	L2ToL1MessagePasserAddr           = common.HexToAddress(L2ToL1MessagePasser)
 	DeployerWhitelistAddr             = common.HexToAddress(DeployerWhitelist)
-	WTONAddr                          = common.HexToAddress(WTON)
+	WNativeTokenAddr                  = common.HexToAddress(WNativeToken)
 	L2CrossDomainMessengerAddr        = common.HexToAddress(L2CrossDomainMessenger)
 	L2StandardBridgeAddr              = common.HexToAddress(L2StandardBridge)
 	SequencerFeeVaultAddr             = common.HexToAddress(SequencerFeeVault)
@@ -48,7 +48,7 @@ var (
 	L1FeeVaultAddr                    = common.HexToAddress(L1FeeVault)
 	SchemaRegistryAddr                = common.HexToAddress(SchemaRegistry)
 	EASAddr                           = common.HexToAddress(EAS)
-	WETHAddr                          = common.HexToAddress(WETH)
+	ETHAddr                           = common.HexToAddress(ETH)
 
 	Predeploys = make(map[string]*common.Address)
 )
@@ -56,8 +56,10 @@ var (
 // IsProxied returns true for predeploys that will sit behind a proxy contract
 func IsProxied(predeployAddr common.Address) bool {
 	switch predeployAddr {
-	case WTONAddr:
+	case LegacyERC20NativeTokenAddr:
+	case WNativeTokenAddr:
 	case GovernanceTokenAddr:
+	case ETHAddr:
 	default:
 		return true
 	}
@@ -65,9 +67,10 @@ func IsProxied(predeployAddr common.Address) bool {
 }
 
 func init() {
+	Predeploys["LegacyERC20NativeToken"] = &LegacyERC20NativeTokenAddr
 	Predeploys["L2ToL1MessagePasser"] = &L2ToL1MessagePasserAddr
 	Predeploys["DeployerWhitelist"] = &DeployerWhitelistAddr
-	Predeploys["WTON"] = &WTONAddr
+	Predeploys["WNativeToken"] = &WNativeTokenAddr
 	Predeploys["L2CrossDomainMessenger"] = &L2CrossDomainMessengerAddr
 	Predeploys["L2StandardBridge"] = &L2StandardBridgeAddr
 	Predeploys["SequencerFeeVault"] = &SequencerFeeVaultAddr
@@ -84,5 +87,5 @@ func init() {
 	Predeploys["L1FeeVault"] = &L1FeeVaultAddr
 	Predeploys["SchemaRegistry"] = &SchemaRegistryAddr
 	Predeploys["EAS"] = &EASAddr
-	Predeploys["WETH"] = &WETHAddr
+	Predeploys["ETH"] = &ETHAddr
 }
