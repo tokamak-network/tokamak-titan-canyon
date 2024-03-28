@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 
 	"github.com/ethereum-optimism/optimism/op-bindings/bindings"
+	"github.com/ethereum-optimism/optimism/op-bindings/predeploys"
 	"github.com/ethereum-optimism/optimism/op-chain-ops/immutables"
 	"github.com/ethereum-optimism/optimism/op-chain-ops/state"
 	"github.com/ethereum-optimism/optimism/op-service/eth"
@@ -35,7 +36,23 @@ func setProxies(db vm.StateDB, proxyAdminAddr common.Address, namespace *big.Int
 		return err
 	}
 	if len(depBytecode) == 0 {
-		return errors.New("Proxy has empty bytecode")
+		return errors.New("the contract Proxy has empty bytecode")
+	}
+
+	l2UsdcBridgeProxyBytecode, err := bindings.GetDeployedBytecode("L2UsdcBridgeProxy")
+	if err != nil {
+		return err
+	}
+	if len(l2UsdcBridgeProxyBytecode) == 0 {
+		return errors.New("the contract L2UsdcBridgeProxy has empty bytecode")
+	}
+
+	fiatTokenProxyBytecode, err := bindings.GetDeployedBytecode("FiatTokenProxy")
+	if err != nil {
+		return err
+	}
+	if len(fiatTokenProxyBytecode) == 0 {
+		return errors.New("the contract FiatTokenProxy has empty bytecode")
 	}
 
 	for i := uint64(0); i <= count; i++ {
@@ -46,7 +63,15 @@ func setProxies(db vm.StateDB, proxyAdminAddr common.Address, namespace *big.Int
 			db.CreateAccount(addr)
 		}
 
-		db.SetCode(addr, depBytecode)
+		switch addr {
+		case predeploys.L2UsdcBridgeAddr:
+			db.SetCode(addr, l2UsdcBridgeProxyBytecode)
+		case predeploys.FiatTokenV2_2Addr:
+			db.SetCode(addr, fiatTokenProxyBytecode)
+		default:
+			db.SetCode(addr, depBytecode)
+		}
+
 		db.SetState(addr, AdminSlot, eth.AddressAsLeftPaddedHash(proxyAdminAddr))
 		log.Trace("Set proxy", "address", addr, "admin", proxyAdminAddr)
 	}

@@ -732,14 +732,9 @@ func NewL2ImmutableConfig(config *DeployConfig, block *types.Block) (immutables.
 	}
 	immutable["WETH"] = immutables.ImmutableValues{}
 	immutable["L2UsdcBridge"] = immutables.ImmutableValues{}
-	immutable["L2UsdcBridgeProxy"] = immutables.ImmutableValues{
-		"logic":        predeploys.L2UsdcBridgeAddr,
-		"initialOwner": config.L2UsdcBridgeOwner,
-		"data":         config.L2UsdcBridgeProxyData,
-	}
 	immutable["SignatureChecker"] = immutables.ImmutableValues{}
 	immutable["MasterMinter"] = immutables.ImmutableValues{
-		"minterManager": predeploys.FiatTokenProxyAddr,
+		"minterManager": predeploys.FiatTokenV2_2Addr,
 	}
 	immutable["FiatTokenProxy"] = immutables.ImmutableValues{
 		"implementationContract": predeploys.FiatTokenV2_2Addr,
@@ -819,9 +814,6 @@ func NewL2StorageConfig(config *DeployConfig, block *types.Block) (state.Storage
 		"_symbol": "WETH",
 	}
 	storage["L2UsdcBridge"] = state.StorageValues{
-		"messenger": predeploys.L2CrossDomainMessengerAddr,
-	}
-	storage["L2UsdcBridgeProxy"] = state.StorageValues{
 		"messenger": predeploys.L2CrossDomainMessengerAddr,
 	}
 	storage["SignatureChecker"] = state.StorageValues{}

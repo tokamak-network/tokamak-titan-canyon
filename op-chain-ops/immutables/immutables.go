@@ -157,24 +157,10 @@ func BuildOptimism(immutable ImmutableConfig) (DeploymentResults, error) {
 			Name: "L2UsdcBridge",
 		},
 		{
-			Name: "L2UsdcBridgeProxy",
-			Args: []interface{}{
-				predeploys.L2UsdcBridgeAddr,
-				immutable["L2UsdcBridgeProxy"]["initialOwner"],
-				immutable["L2UsdcBridgeProxy"]["data"],
-			},
-		},
-		{
 			Name: "SignatureChecker",
 		},
 		{
 			Name: "MasterMinter",
-			Args: []interface{}{
-				predeploys.FiatTokenProxyAddr,
-			},
-		},
-		{
-			Name: "FiatTokenProxy",
 			Args: []interface{}{
 				predeploys.FiatTokenV2_2Addr,
 			},
@@ -207,9 +193,6 @@ func l2Deployer(backend *backends.SimulatedBackend, opts *bind.TransactOpts, dep
 	var recipient common.Address
 	var minimumWithdrawalAmount *big.Int
 	var withdrawalNetwork uint8
-	var logic common.Address
-	var initialOwner common.Address
-	var data []byte
 	var err error
 	switch deployment.Name {
 	case "GasPriceOracle":
@@ -284,12 +267,6 @@ func l2Deployer(backend *backends.SimulatedBackend, opts *bind.TransactOpts, dep
 		_, tx, _, err = bindings.DeployWETH(opts, backend)
 	case "L2UsdcBridge":
 		_, tx, _, err = bindings.DeployL2UsdcBridge(opts, backend)
-	case "L2UsdcBridgeProxy":
-		logic, initialOwner, data, err = prepareL2UsdcBridgeArgument(deployment)
-		if err != nil {
-			return nil, err
-		}
-		_, tx, _, err = bindings.DeployL2UsdcBridgeProxy(opts, backend, logic, initialOwner, data)
 	case "SignatureChecker":
 		_, tx, _, err = bindings.DeploySignatureChecker(opts, backend)
 	case "MasterMinter":
@@ -327,20 +304,4 @@ func prepareFeeVaultArguments(deployment deployer.Constructor) (common.Address, 
 		return common.Address{}, nil, 0, fmt.Errorf("invalid type for withdrawalNetwork")
 	}
 	return recipient, minimumWithdrawalAmountHex.ToInt(), withdrawalNetwork, nil
-}
-
-func prepareL2UsdcBridgeArgument(deployment deployer.Constructor) (common.Address, common.Address, []byte, error) {
-	logic, ok := deployment.Args[0].(common.Address)
-	if !ok {
-		return common.Address{}, common.Address{}, nil, fmt.Errorf("invalid type for logic")
-	}
-	initialOwner, ok := deployment.Args[1].(common.Address)
-	if !ok {
-		return common.Address{}, common.Address{}, nil, fmt.Errorf("invalid type for initialOwner")
-	}
-	data, ok := deployment.Args[2].([]byte)
-	if !ok {
-		return common.Address{}, common.Address{}, nil, fmt.Errorf("invalid type for data")
-	}
-	return logic, initialOwner, data, nil
 }
