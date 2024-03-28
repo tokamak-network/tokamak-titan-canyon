@@ -123,12 +123,15 @@ def main():
     else:
         log.info(f'Building docker images for git commit {git_commit} ({git_date})')
         run_command(['docker', 'compose', 'build', '--progress', 'plain',
-                     '--build-arg', f'GIT_COMMIT={git_commit}', '--build-arg', f'GIT_DATE={git_date}'],
-                    cwd=paths.ops_bedrock_dir, env={
+                    '--build-arg', f'GIT_COMMIT={git_commit}', '--build-arg', f'GIT_DATE={git_date}'],
+                cwd=paths.ops_bedrock_dir, env={
             'PWD': paths.ops_bedrock_dir,
             'L2_IMAGE': args.l2_image,
             'DOCKER_BUILDKIT': '1', # (should be available by default in later versions, but explicitly enable it anyway)
-            'COMPOSE_DOCKER_CLI_BUILD': '1'  # use the docker cache
+            'COMPOSE_DOCKER_CLI_BUILD': '1',  # use the docker cache
+            'L1_DOCKER_FILE': 'Dockerfile.l1.fork' if paths.fork_public_network else 'Dockerfile.l1',
+            'FROM_BLOCK_NUMBER': str(args.from_block_number),
+            'L1_RPC': args.l1_rpc_url
         })
 
     log.info('Devnet starting')
@@ -243,7 +246,8 @@ def devnet_l1_genesis(paths):
         log.info('Start to fork the public network. Wait to warm up the fork public network.')
         geth = subprocess.Popen([
             'anvil', '--fork-url', paths.l1_rpc_url, '--fork-block-number', str(paths.from_block_number),
-            '--chain-id', '1337'
+            '--chain-id', '900', '--disable-block-gas-limit',
+            '--gas-price', '0', '--base-fee', '1', '--block-time', '1'
         ])
         time.sleep(30)
     else:

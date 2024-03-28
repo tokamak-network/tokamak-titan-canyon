@@ -18,13 +18,13 @@ services:
       args:
         GIT_COMMIT: "dev"
         GIT_DATE: "0"
-    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-stack-go:devnet
+    image: onthertech/titan-op-stack-go:${IMAGE_TAG:-latest}
     entrypoint: ["echo", "build complete"]
 
   l1:
     build:
       context: .
-      dockerfile: Dockerfile.l1
+      dockerfile: ${L1_DOCKER_FILE:-Dockerfile.l1}
     ports:
       - "8545:8545"
       - "8546:8546"
@@ -35,6 +35,8 @@ services:
       - "${PWD}/test-jwt-secret.txt:/config/test-jwt-secret.txt"
     environment:
       GETH_MINER_RECOMMIT: 100ms
+      FROM_BLOCK_NUMBER: ${FROM_BLOCK_NUMBER}
+      L1_RPC: ${L1_RPC}
 
   l2:
     build:
@@ -65,11 +67,11 @@ services:
       context: ../
       dockerfile: ./op-node/Dockerfile
       args:
-        OP_STACK_GO_BUILDER: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-stack-go:devnet
-    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-node:devnet
+        OP_STACK_GO_BUILDER: onthertech/titan-op-stack-go:${IMAGE_TAG:-latest}
+    image: onthertech/titan-op-node:${IMAGE_TAG:-latest}
     command: >
       op-node
-      --l1=ws://l1:8546
+      --l1=http://l1:8545
       --l2=http://l2:8551
       --l2.jwt-secret=/config/test-jwt-secret.txt
       --sequencer.enabled
@@ -113,8 +115,8 @@ services:
       context: ../
       dockerfile: ./op-proposer/Dockerfile
       args:
-        OP_STACK_GO_BUILDER: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-stack-go:devnet
-    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-proposer:devnet
+        OP_STACK_GO_BUILDER: onthertech/titan-op-stack-go:${IMAGE_TAG:-latest}
+    image: onthertech/titan-op-proposer:${IMAGE_TAG:-latest}
     ports:
       - "6062:6060"
       - "7302:7300"
@@ -142,8 +144,8 @@ services:
       context: ../
       dockerfile: ./op-batcher/Dockerfile
       args:
-        OP_STACK_GO_BUILDER: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-stack-go:devnet
-    image: us-docker.pkg.dev/oplabs-tools-artifacts/images/op-batcher:devnet
+        OP_STACK_GO_BUILDER: onthertech/titan-op-stack-go:${IMAGE_TAG:-latest}
+    image: onthertech/titan-op-batcher:${IMAGE_TAG:-latest}
     ports:
       - "6061:6060"
       - "7301:7300"
