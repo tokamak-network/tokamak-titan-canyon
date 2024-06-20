@@ -7,7 +7,7 @@ on:
 
 jobs:
   go-test:
-    runs-on: ubuntu-latest-l
+    runs-on: ubuntu-latest
     name: Go test ${{matrix.name}}
     container:
       image: onthertech/thanos-ci-builder:ecotone
